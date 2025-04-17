@@ -1,15 +1,12 @@
-//
-// Created by jackson turnbull on 4/16/25.
-//
-
 #ifndef FILTERING_H
 #define FILTERING_H
 #include <cmath>
 #include <queue>
 #include <map>
 #include <iomanip>
+#include <fstream>
 #include <random>
-
+#include "RBTree.h"
 using namespace std;
 
 class CollaborativeFiltering {
@@ -90,7 +87,6 @@ private:
 
         return numerator / (sqrt(denom1) * sqrt(denom2));
     }
-
 public:
     // CSV parsing helper function
     vector<string> parseCSVLine(const string& line) {
@@ -314,4 +310,5 @@ public:
         return ids;
     }
 };
+
 #endif //FILTERING_H

@@ -48,28 +48,8 @@ private:
     MovieNode *root;
     MovieNode *NIL; // Sentinel node
 
-    // Helper functions
-    void rotateLeft(MovieNode *x);
-    void rotateRight(MovieNode *x);
-    void fixInsert(MovieNode *k);
-    void fixDelete(MovieNode *x);
-    void transplant(MovieNode *u, MovieNode *v);
-    MovieNode* minimum(MovieNode *node);
-    void inOrderHelper(MovieNode *node, vector<Movie> &movies);
-    void deleteNodeHelper(MovieNode *node, int movieId);
-    MovieNode* searchTreeHelper(MovieNode *node, int movieId);
 
 public:
-    MovieRBTree();
-    ~MovieRBTree();
-
-    void insert(Movie movie);
-    void remove(int movieId);
-    MovieNode* search(int movieId);
-    vector<Movie> inOrder();
-
-    // Clean up resources
-    void deleteTree(MovieNode *node);
 
     // Make NIL public for use in collaborative filtering
     MovieNode* getNIL() { return NIL; }

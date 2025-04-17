@@ -1,11 +1,15 @@
-//
-// Created by jackson turnbull on 4/16/25.
-//
-
-#ifndef RECCOMENDATIONSYSTEM_H
-#define RECCOMENDATIONSYSTEM_H
+#ifndef RECOMMENDATIONSYSTEM_H
+#define RECOMMENDATIONSYSTEM_H
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
+#include <chrono>
+#include "Filtering.h"
+
 
 using namespace std;
 
@@ -189,5 +193,25 @@ public:
 
         // Measure search performance
         auto startTime = chrono::high_resolution_clock::now();
-        int num
-#endif //RECCOMENDATIONSYSTEM_H
+        int num;
+        // Measure search performance
+        auto startTime = chrono::high_resolution_clock::now();
+
+        int num; // Assign or get the movie ID you want to search
+        cin >> num; // Or set num = some_movie_id;
+        auto result = movieTree.search(num);
+
+        auto endTime = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime).count();
+
+        if (result != nullptr && result != movieTree.getNIL()) {
+            cout << "Movie found: " << result->movie.title << endl;
+        } else {
+            cout << "Movie not found." << endl;
+        }
+
+        cout << "Search took " << duration << " microseconds" << endl;
+    }
+};
+
+#endif //RECOMMENDATIONSYSTEM_H
