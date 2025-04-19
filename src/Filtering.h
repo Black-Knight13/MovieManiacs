@@ -38,7 +38,7 @@ private:
              [](const auto& a, const auto& b) { return a.second > b.second; });
 
         // Return top k similar users
-        if (k < similarities.size()) {
+        if (static_cast<size_t>(k) < similarities.size()) {
             similarities.resize(k);
         }
 
@@ -308,6 +308,16 @@ public:
         }
 
         return ids;
+    }
+
+    // expose the raw MovieNode* search (for content filtering)
+    MovieNode* getMovieNode(int movieId) {
+        return movieTree.search(movieId);
+    }
+
+    // get all movies (in‑order) for iterating in content filtering
+    vector<Movie> getAllMovies() {
+        return movieTree.inOrder();
     }
 };
 

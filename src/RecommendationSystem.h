@@ -110,6 +110,12 @@ public:
         cout << "Time: " << cfTime << " ms" << endl;
 
         // We'd add content-based filtering recommendations here as well
+        auto cbRecs = getContentRecommendations(movieId);
+        cout << "\nContent-Based Recommendations for \"" << title << "\":" << endl;
+        cout << "----------------------------------------" << endl;
+        for (const auto& [movie, score] : cbRecs) {
+            cout << movie.title << " (Genre-Overlap Score: " << fixed << setprecision(2) << score << ")" << endl;
+        }
     }
 
     // Suggest similar titles if the exact title isn't found
@@ -172,6 +178,65 @@ public:
         return 1.0f - (d[len1][len2] / maxLen);
     }
 
+    vector<pair<Movie, float>> getContentRecommendations(int movieId, int numRecs = 5) {
+        // 1) Find the target movie node
+        MovieNode* target = cfSystem.getMovieNode(movieId);
+        if (!target) return {};
+
+        // 2) Build a max‑heap of (score, movieId)
+        struct Scored { float score; int id;
+            bool operator<(Scored const& o) const { return score < o.score; }
+        };
+        priority_queue<Scored> heap;
+
+        // 3) Compute simple genre‑overlap score for every other movie
+        auto allMovies = cfSystem.getAllMovies();
+        for (auto &m : allMovies) {
+            if (m.movieId == movieId) continue;
+            float score = 0;
+            for (auto &g1 : target->movie.genres)
+                for (auto &g2 : m.genres)
+                    if (g1 == g2) score += 1.0f;  // +1 per matching genre
+            heap.push({score, m.movieId});
+        }
+
+        // 4) Pop top numRecs and assemble results
+        vector<pair<Movie, float>> recs;
+        for (int i = 0; i < numRecs && !heap.empty(); ++i) {
+            auto top = heap.top(); heap.pop();
+            MovieNode* node = cfSystem.getMovieNode(top.id);
+            if (node)
+                recs.push_back({ node->movie, top.score });
+        }
+        return recs;
+    }
+
+    // Test the Red-Black Tree operations specifically
+    void testTreeOperations() {
+        cout << "\nTesting Red-Black Tree operations..." << endl;
+        auto allMovieIds = cfSystem.getAllMovieIds();
+        if (allMovieIds.empty()) {
+            cout << "No movies available for testing" << endl;
+            return;
+        }
+        cout << "Enter a movie ID to search: ";
+        int num;
+        cin >> num;
+
+        auto start = chrono::high_resolution_clock::now();
+        auto result = cfSystem.getMovieNode(num);
+        auto duration = chrono::duration_cast<chrono::microseconds>(
+                chrono::high_resolution_clock::now() - start
+        ).count();
+
+        if (result) {
+            cout << "Movie found: " << result->movie.title << endl;
+        } else {
+            cout << "Movie not found." << endl;
+        }
+        cout << "Search took " << duration << " μs" << endl;
+    }
+
     // Run performance benchmark
     void runPerformanceBenchmark() {
         cout << "\nRunning performance benchmark..." << endl;
@@ -181,37 +246,6 @@ public:
         testTreeOperations();
     }
 
-    // Test the Red-Black Tree operations specifically
-    void testTreeOperations() {
-        cout << "\nTesting Red-Black Tree operations..." << endl;
-
-        vector<int> allMovieIds = cfSystem.getAllMovieIds();
-        if (allMovieIds.empty()) {
-            cout << "No movies available for testing" << endl;
-            return;
-        }
-
-        // Measure search performance
-        auto startTime = chrono::high_resolution_clock::now();
-        int num;
-        // Measure search performance
-        auto startTime = chrono::high_resolution_clock::now();
-
-        int num; // Assign or get the movie ID you want to search
-        cin >> num; // Or set num = some_movie_id;
-        auto result = movieTree.search(num);
-
-        auto endTime = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime).count();
-
-        if (result != nullptr && result != movieTree.getNIL()) {
-            cout << "Movie found: " << result->movie.title << endl;
-        } else {
-            cout << "Movie not found." << endl;
-        }
-
-        cout << "Search took " << duration << " microseconds" << endl;
-    }
 };
 
 #endif //RECOMMENDATIONSYSTEM_H

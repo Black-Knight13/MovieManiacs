@@ -46,14 +46,31 @@ struct MovieNode {
 class MovieRBTree {
 private:
     MovieNode *root;
-    MovieNode *NIL; // Sentinel node
-
-
+    MovieNode *NIL;
 public:
-
-    // Make NIL public for use in collaborative filtering
     MovieNode* getNIL() { return NIL; }
+    // ← add the following declarations here:
+    MovieRBTree();
+    ~MovieRBTree();
+    void insert(const Movie&);
+    MovieNode* search(int movieId);
+    std::vector<Movie> inOrder();
+    void remove(int movieId);
+
+private:
+    // and also declare these helpers:
+    void deleteTree(MovieNode *node);
+    void rotateLeft(MovieNode *x);
+    void rotateRight(MovieNode *x);
+    void fixInsert(MovieNode *k);
+    MovieNode* searchTreeHelper(MovieNode *node, int movieId);
+    void inOrderHelper(MovieNode *node, std::vector<Movie> &movies);
+    MovieNode* minimum(MovieNode *node);
+    void transplant(MovieNode *u, MovieNode *v);
+    void fixDelete(MovieNode *x);
+    void deleteNodeHelper(MovieNode *node, int movieId);
 };
+
 
 // Constructor
 MovieRBTree::MovieRBTree() {
@@ -170,7 +187,7 @@ void MovieRBTree::fixInsert(MovieNode *k) {
 }
 
 // Insert a movie into the Red-Black Tree
-void MovieRBTree::insert(Movie movie) {
+void MovieRBTree::insert(const Movie& movie) {
     MovieNode *node = new MovieNode(movie);
     node->left = NIL;
     node->right = NIL;
