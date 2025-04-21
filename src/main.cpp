@@ -1,7 +1,3 @@
-//
-// Created by jackson turnbull on 4/16/25.
-//
-
 #include "Filtering.h"
 #include "RBTree.h"
 #include "RecommendationSystem.h"
@@ -18,7 +14,7 @@ void printMenu() {
 
 int main() {
     RecommendationSystem sys;
-    if (!sys.initialize("../Movie Data/movies.csv", "rankings.csv")) {
+    if (!sys.initialize("movies.csv", "ratings.csv")) {
         return 1;
     }
 
@@ -46,3 +42,4 @@ int main() {
     return 0;
 
 }
+

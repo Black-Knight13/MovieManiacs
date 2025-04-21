@@ -14,9 +14,10 @@
 using namespace std;
 
 class RecommendationSystem {
-private:
     CollaborativeFiltering cfSystem;
-    // We'd implement Content-Based filtering here as well
+
+    // Content-Based filtering still needs to be implemented | ContentBasedFiltering cbSystem
+
     unordered_map<string, int> titleToId; // For title lookup
     unordered_map<int, string> idToTitle; // For reverse lookup
 
@@ -103,7 +104,7 @@ public:
 
         // Display recommendations
         cout << "\nCollaborative Filtering Recommendations for \"" << title << "\":" << endl;
-        cout << "----------------------------------------" << endl;
+        cout << "-----------------------------------------------------------------------------" << endl << endl;
         for (const auto& [movie, score] : cfRecommendations) {
             cout << movie.title << " (Score: " << fixed << setprecision(2) << score << ")" << endl;
         }
@@ -112,7 +113,7 @@ public:
         // We'd add content-based filtering recommendations here as well
         auto cbRecs = getContentRecommendations(movieId);
         cout << "\nContent-Based Recommendations for \"" << title << "\":" << endl;
-        cout << "----------------------------------------" << endl;
+        cout << "-----------------------------------------------------------------------------" << endl << endl;
         for (const auto& [movie, score] : cbRecs) {
             cout << movie.title << " (Genre-Overlap Score: " << fixed << setprecision(2) << score << ")" << endl;
         }
@@ -126,7 +127,7 @@ public:
             // Simple string similarity
             float similarity = calculateStringSimilarity(query, title);
             if (similarity > 0.5) { // Threshold
-                similarTitles.push_back({title, similarity});
+                similarTitles.emplace_back(title, similarity);
             }
         }
 
@@ -146,7 +147,7 @@ public:
     }
 
     // Calculate string similarity using Levenshtein distance
-    float calculateStringSimilarity(const string& s1, const string& s2) {
+    float static calculateStringSimilarity(const string& s1, const string& s2) {
         // Convert to lowercase for case-insensitive comparison
         string s1_lower = s1;
         string s2_lower = s2;
@@ -156,17 +157,17 @@ public:
         // Levenshtein distance implementation
         const size_t len1 = s1_lower.size();
         const size_t len2 = s2_lower.size();
-        vector<vector<unsigned int>> d(len1 + 1, vector<unsigned int>(len2 + 1));
+        vector<vector<unsigned int>> diff(len1 + 1, vector<unsigned int>(len2 + 1));
 
-        for(unsigned int i = 0; i <= len1; ++i) d[i][0] = i;
-        for(unsigned int i = 0; i <= len2; ++i) d[0][i] = i;
+        for(unsigned int i = 0; i <= len1; ++i) diff[i][0] = i;
+        for(unsigned int i = 0; i <= len2; ++i) diff[0][i] = i;
 
         for(unsigned int i = 1; i <= len1; ++i) {
             for(unsigned int j = 1; j <= len2; ++j) {
-                d[i][j] = min({
-                    d[i - 1][j] + 1, // deletion
-                    d[i][j - 1] + 1, // insertion
-                    d[i - 1][j - 1] + (s1_lower[i - 1] == s2_lower[j - 1] ? 0 : 1) // substitution
+                diff[i][j] = min({
+                    diff[i - 1][j] + 1, // deletion
+                    diff[i][j - 1] + 1, // insertion
+                    diff[i - 1][j - 1] + (s1_lower[i - 1] == s2_lower[j - 1] ? 0 : 1) // substitution
                 });
             }
         }
@@ -175,7 +176,7 @@ public:
         float maxLen = max(len1, len2);
         if (maxLen == 0) return 1.0; // Both strings empty
 
-        return 1.0f - (d[len1][len2] / maxLen);
+        return 1.0f - (diff[len1][len2] / maxLen);
     }
 
     vector<pair<Movie, float>> getContentRecommendations(int movieId, int numRecs = 5) {
@@ -206,7 +207,7 @@ public:
             auto top = heap.top(); heap.pop();
             MovieNode* node = cfSystem.getMovieNode(top.id);
             if (node)
-                recs.push_back({ node->movie, top.score });
+                recs.emplace_back( node->movie, top.score );
         }
         return recs;
     }
@@ -241,9 +242,6 @@ public:
     void runPerformanceBenchmark() {
         cout << "\nRunning performance benchmark..." << endl;
         cfSystem.analyzePerformance();
-
-        // Test tree operations
-        testTreeOperations();
     }
 
 };

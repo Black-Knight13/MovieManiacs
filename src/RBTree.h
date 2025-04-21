@@ -4,9 +4,9 @@
 #ifndef RBTREE_H
 #define RBTREE_H
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
-#include <chrono>
 
 using namespace std;
 
@@ -20,7 +20,7 @@ struct Movie {
     vector<string> genres;
     unordered_map<int, float> userRatings; // userId -> rating
 
-    Movie(int id = 0, string t = "") : movieId(id), title(t) {}
+    Movie(int id = 0, string t = "") : movieId(id), title(std::move(t)) {}
 };
 
 // User structure to store user preferences
@@ -37,7 +37,7 @@ struct MovieNode {
     Color color;
     MovieNode *left, *right, *parent;
 
-    MovieNode(Movie m) : movie(m), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
+    MovieNode(Movie m) : movie(std::move(m)), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
 };
 
 // Red-Black Tree class for storing movies

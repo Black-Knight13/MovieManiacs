@@ -87,6 +87,7 @@ private:
 
         return numerator / (sqrt(denom1) * sqrt(denom2));
     }
+
 public:
     // CSV parsing helper function
     vector<string> parseCSVLine(const string& line) {
