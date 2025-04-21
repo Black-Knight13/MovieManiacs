@@ -50,4 +50,7 @@ The key files include:
 ---
 
 ## 🧑‍💻 How to Use
-1. 
+1. Load the csv files in the `Movie Data` Directory into the **initialize** function.
+2. Select a menu option
+3. Input the movie name followed by the year released in parenthesis; ex. `TMNT (2007)`
+
