@@ -215,27 +215,44 @@ public:
     // Test the Red-Black Tree operations specifically
     void testTreeOperations() {
         cout << "\nTesting Red-Black Tree operations..." << endl;
-        auto allMovieIds = cfSystem.getAllMovieIds();
-        if (allMovieIds.empty()) {
+        auto allIds = cfSystem.getAllMovieIds();
+        if (allIds.empty()) {
             cout << "No movies available for testing" << endl;
             return;
         }
         cout << "Enter a movie ID to search: ";
-        int num;
-        cin >> num;
+        string line;
+        if (!getline(cin, line)) { cin.clear(); return; }
+        int id;
+        try {
+            id = stoi(line);
+        } catch (...) {
+            cout << "Invalid ID. Please enter a number." << endl;
+            return;
+        }
 
         auto start = chrono::high_resolution_clock::now();
-        auto result = cfSystem.getMovieNode(num);
-        auto duration = chrono::duration_cast<chrono::microseconds>(
+        MovieNode* node = cfSystem.getMovieNode(id);
+        auto elapsed_us = chrono::duration_cast<chrono::microseconds>(
                 chrono::high_resolution_clock::now() - start
         ).count();
 
-        if (result) {
-            cout << "Movie found: " << result->movie.title << endl;
+        if (node) {
+            // Print everything on one line:
+            cout << "Movie: "
+                 << node->movie.movieId
+                 << " - " << node->movie.title
+                 << " - Genres: ";
+            for (size_t i = 0; i < node->movie.genres.size(); ++i) {
+                cout << node->movie.genres[i];
+                if (i + 1 < node->movie.genres.size()) cout << ", ";
+            }
+            cout << endl;
         } else {
             cout << "Movie not found." << endl;
         }
-        cout << "Search took " << duration << " μs" << endl;
+
+        cout << "Search took " << elapsed_us << " us" << endl;
     }
 
     // Run performance benchmark
